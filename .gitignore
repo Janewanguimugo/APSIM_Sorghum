@@ -1,0 +1,7 @@
+project/*
+Maize_Results/*
+*.RData
+*.met
+*.rds
+*.csv
+.Rproj.user
