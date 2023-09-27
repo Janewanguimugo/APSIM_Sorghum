@@ -9,6 +9,19 @@
 #'
 #' @examples
 apsim.plots<- function(results, b, wkdir){
+  my_packages <- c("spdep", "rgdal", "maptools", "raster", "plyr", "ggplot2", "rgdal",
+                   "dplyr", "cowplot","readxl", "apsimx", "gtools", "foreach","doParallel",
+                   "ranger", "viridis")
+  list.of.packages <- my_packages
+  new.packages <- list.of.packages[!(my_packages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  lapply(my_packages, require, character.only = TRUE)
+  
+  cores<- detectCores()
+  myCluster <- makeCluster(cores -2, # number of cores to use
+                           type = "PSOCK") # type of cluster
+  registerDoParallel(myCluster)
+  
   setwd(wkdir)
   stn<- read.csv("station.csv")
   
@@ -49,16 +62,19 @@ apsim.plots<- function(results, b, wkdir){
   
   country<-getData("GADM", country=b, level=0)
   
-  print(ggplot()+geom_polygon(data=country, aes(x=long, y=lat), fill = "white")+
-          geom_point(data=final, aes(x=Longitude, y=Latitude, color= SowDate), size = 4)+ 
-          facet_wrap(~ Ideotype))
+  print(ggplot() +
+          geom_polygon(data = country, aes(x = long, y = lat), fill = "white") +
+          geom_point(data = final, aes(x = Longitude, y = Latitude, color = factor(SowDate)), size = 4, shape = 15) +
+          facet_wrap(~ Ideotype) +
+          scale_color_viridis_d())
+  print(ggplot() +
+    geom_polygon(data = country, aes(x = long, y = lat), fill = "white") +
+    geom_point(data = final, aes(x = Longitude, y = Latitude, color = FinalYield_kg_Ha), size = 4, shape = 15) +
+    facet_wrap(~ Ideotype) +
+    scale_color_viridis(option = "D"))
   
-  print(ggplot()+geom_polygon(data=country, aes(x=long, y=lat), fill = "white")+
-          geom_point(data=final, aes(x=Longitude, y=Latitude, color= FinalYield_kg_Ha), size = 4)+
-          facet_wrap(~ Ideotype))
-  
-  print(ggplot() +  geom_point(data=final, aes(x=Longitude, y=Latitude, color= SowDate), size = 4)+
-          facet_wrap(~ Ideotype))
-  print(ggplot() +  geom_point(data=final, aes(x=Longitude, y=Latitude, color= FinalYield_kg_Ha), size = 4)+
-          facet_wrap(~ Ideotype))
+  # print(ggplot() +  geom_point(data=final, aes(x=Longitude, y=Latitude, color= SowDate), size = 4)+
+  #         facet_wrap(~ Ideotype))
+  # print(ggplot() +  geom_point(data=final, aes(x=Longitude, y=Latitude, color= FinalYield_kg_Ha), size = 4)+
+  #         facet_wrap(~ Ideotype))
 }

@@ -23,7 +23,8 @@ results<- apsim.spatial(wkdir ="D:/Zimbabwe/project",
                         my_list_clm = my_list_clm,
                         my_list_sol = my_list_sol
                         )
-
+saveRDS(results, "D:/Zimbabwe/project/my_results.rds")
+results <- readRDS("D:/Zimbabwe/project/my_results.rds")
 #03 Plot the Outputs for the highest mean yield variety
 ##THIRD FUNCTION ON PLOTTING USING THE RESULTS OBTAINED FROM apsim.spatial COMMAND##
 #results = the results list obtained from apsim.spatial command
